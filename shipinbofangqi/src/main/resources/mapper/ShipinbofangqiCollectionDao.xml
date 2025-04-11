@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShipinbofangqiCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shipinbofangqi_id as shipinbofangqiId
+        ,a.yonghu_id as yonghuId
+        ,a.shipinbofangqi_collection_types as shipinbofangqiCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShipinbofangqiCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,shipinbofangqi.shipinbofangqi_name as shipinbofangqiName
+        ,shipinbofangqi.shipinbofangqi_types as shipinbofangqiTypes
+        ,shipinbofangqi.shipinbofangqi_photo as shipinbofangqiPhoto
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_phone as yonghuPhone
+
+        FROM shipinbofangqi_collection  a
+        left JOIN shipinbofangqi shipinbofangqi ON a.shipinbofangqi_id = shipinbofangqi.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shipinbofangqiId != null and params.shipinbofangqiId != ''">
+                and (
+                    a.shipinbofangqi_id = #{params.shipinbofangqiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.shipinbofangqiCollectionTypes != null and params.shipinbofangqiCollectionTypes != ''">
+                and a.shipinbofangqi_collection_types = #{params.shipinbofangqiCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断视频信息的id不为空 -->
+            <if test=" params.shipinbofangqiIdNotNull != '' and params.shipinbofangqiIdNotNull != null and params.shipinbofangqiIdNotNull != 'null' ">
+                and a.shipinbofangqi_id IS NOT NULL
+            </if>
+            <if test=" params.shipinbofangqiName != '' and params.shipinbofangqiName != null and params.shipinbofangqiName != 'null' ">
+                and shipinbofangqi.shipinbofangqi_name like CONCAT('%',#{params.shipinbofangqiName},'%')
+            </if>
+            <if test="params.shipinbofangqiTypes != null  and params.shipinbofangqiTypes != ''">
+                and shipinbofangqi.shipinbofangqi_types = #{params.shipinbofangqiTypes}
+            </if>
+
+            <if test=" params.shipinbofangqiVideo != '' and params.shipinbofangqiVideo != null and params.shipinbofangqiVideo != 'null' ">
+                and shipinbofangqi.shipinbofangqi_video like CONCAT('%',#{params.shipinbofangqiVideo},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and shipinbofangqi.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and shipinbofangqi.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and shipinbofangqi.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and shipinbofangqi.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and shipinbofangqi.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and shipinbofangqi.cai_number = #{params.caiNumber}
+            </if>
+            <if test=" params.shipinbofangqiContent != '' and params.shipinbofangqiContent != null and params.shipinbofangqiContent != 'null' ">
+                and shipinbofangqi.shipinbofangqi_content like CONCAT('%',#{params.shipinbofangqiContent},'%')
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
